@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const connection = require('')
 
 
 inquirer
@@ -13,7 +14,7 @@ inquirer
   ]). then ((answers) => {
     const {choices} = answers;
     if (choices === 'View all departments' ){
-        viewAllDepaartments();
+        viewAllDepartments();
     }
     if( choices === 'View all roles'){
         viewAllRoles();
@@ -35,4 +36,6 @@ inquirer
     }
   });
 
-  
+  const viewAllDepartments = () =>{
+
+  }
