@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const connection = require('')
+const connection = require('../config/connection.js')
 
 
 inquirer
@@ -37,5 +37,10 @@ inquirer
   });
 
   const viewAllDepartments = () =>{
-
+    const query = `SELECT department.id AS id, department.names AS department FROM department`;
+    connection.promise().query(query, (error, response) => {
+        if (error) throw error;
+        console.table(response);
+        promptUser();
+      });
   }
