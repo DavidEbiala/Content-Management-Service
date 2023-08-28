@@ -27,5 +27,8 @@ CREATE TABLE employee(
     FOREIGN KEY (role_id)
     REFERENCES roles(id)
     ON DELETE SET NULL
+    CONSTRAINT link FOREIGN KEY (manager_id) REFERENCES employee(id)
+    ON DELETE SET NULL
+    ON UPDATE SET NULL
 
 )
