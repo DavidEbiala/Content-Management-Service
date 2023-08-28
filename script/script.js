@@ -104,13 +104,51 @@ function firstPrompt(){
     })
   };
 
-  function viewAllDepartments (){
-    console.log("Viewing departments\n");
-    connection.query('SELECT department.id, department.names FROM department', function(err, results){
-      console.table(results);
-      console.log("Deparments viewed!\n");
-      if (err) throw err;
-      firstPrompt();
+  function addADepartment (){
+    console.log("Adding a department\n");
+    inquirer.prompt([{
+      type: 'input',
+      name: 'department',
+      message: 'What is the name of the new department?',
+    }]).then((answers) => {
+      connection.query('INSERT INTO department (names) VALUES (?)',[answers.department], function(err, results){
+        console.table(results);
+        console.log("Deparments added!\n");
+        if (err) throw err;
+        firstPrompt();
+      })
+    })
+  };
+
+  function addARole (){
+    console.log("Adding a role\n");
+    connection.query(`SELECT * FROM department`)
+    inquirer.prompt([{
+      type: 'input',
+      name: 'roleName',
+      message: 'What is the name of the new department?',
+
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: 'What is the salary of the role?',
+    },
+    {
+      type: 'list',
+      name: 'department',
+      message: 'Which department does the role belong to?',
+      choices: () => {
+
+      }
+    }
+  ]).then((answers) => {
+      connection.query('INSERT INTO department (names) VALUES (?)',[answers.department], function(err, results){
+        console.table(results);
+        console.log("Deparments added!\n");
+        if (err) throw err;
+        firstPrompt();
+      })
     })
   };
 
