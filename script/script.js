@@ -1,7 +1,24 @@
 const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const connection = require('../config/connection.js')
+
+const PORT = process.env.PORT || 3001;
+const app = express();
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+const connection = mysql.createConnection({
+  host: 'localhost',
+  port: 8889,
+  user: 'root',
+  password: 'root',
+  dialect: 'mysql',
+  database: 'deparments_db',
+},
+console.log(`Connected to the books_db database.`)
+);
+
 
 
 connection.connect(function (err) {
@@ -56,23 +73,49 @@ function firstPrompt(){
 }
 
 
+
   function viewAllEmployees () {
     console.log("Viewing employees\n");
-    const query = `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
-    FROM employee e
-    LEFT JOIN role r
-    ON e.role_id = r.id
-    LEFT JOIN department d
-    ON d.id = r.department_id
-    LEFT JOIN employee m
-    ON m.id = e.manager_id`
-    
-    connection.query(query, function (err, res) {
-      if (err) throw err;
-  
-      console.table(res);
+    connection.query('SELECT employee.id, employee.first_name, employee.last_name, roles.title, employee.manager_id FROM employee JOIN roles ON employee.role_id = roles.id', function (err, results) {
+      console.table(results);
       console.log("Employees viewed!\n");
-  
+      if (err) throw err;
       firstPrompt();
     });
-  }
+  };
+
+  function viewAllDepartments (){
+    console.log("Viewing departments\n");
+    connection.query('SELECT department.id, department.names FROM department', function(err, results){
+      console.table(results);
+      console.log("Deparments viewed!\n");
+      if (err) throw err;
+      firstPrompt();
+    })
+  };
+
+  function viewAllRoles (){
+    console.log("Viewing roles\n");
+    connection.query('SELECT roles.id, roles.title, roles.salary, department.names FROM roles JOIN department ON roles.department_id = department_id', function(err, results){
+      console.table(results);
+      console.log("Roles viewed!\n");
+      if (err) throw err;
+      firstPrompt();
+    })
+  };
+
+  function viewAllDepartments (){
+    console.log("Viewing departments\n");
+    connection.query('SELECT department.id, department.names FROM department', function(err, results){
+      console.table(results);
+      console.log("Deparments viewed!\n");
+      if (err) throw err;
+      firstPrompt();
+    })
+  };
+
+
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
