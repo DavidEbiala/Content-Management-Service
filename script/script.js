@@ -122,36 +122,100 @@ function firstPrompt(){
 
   function addARole (){
     console.log("Adding a role\n");
-    connection.query(`SELECT * FROM department`)
-    inquirer.prompt([{
-      type: 'input',
-      name: 'roleName',
-      message: 'What is the name of the new department?',
-
-    },
-    {
-      type: 'input',
-      name: 'salary',
-      message: 'What is the salary of the role?',
-    },
-    {
-      type: 'list',
-      name: 'department',
-      message: 'Which department does the role belong to?',
-      choices: () => {
-
+    connection.query(`SELECT * FROM department`, function (err, results){
+      if (err) throw err;
+      inquirer.prompt([{
+        type: 'input',
+        name: 'roleName',
+        message: 'What is the name of the new department?',
+  
+      },
+      {
+        type: 'input',
+        name: 'salary',
+        message: 'What is the salary of the role?',
+      },
+      {
+        type: 'list',
+        name: 'department',
+        message: 'Which department does the role belong to?',
+        choices: () => {
+          let array = [];
+          for (let i = 0; i <results.length; i++){
+            array.push(results[i].name);
+          }
+          return array;
+        }
       }
-    }
-  ]).then((answers) => {
-      connection.query('INSERT INTO department (names) VALUES (?)',[answers.department], function(err, results){
-        console.table(results);
-        console.log("Deparments added!\n");
-        if (err) throw err;
-        firstPrompt();
+    ]).then((answers) => {
+      for (var i =0; i< results.length; i++){
+        if (results[i].name === answers.department){
+          var department = results[i]
+        }
+      }
+        connection.query('INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)',[answers.roleName, answers.salary, department.id], function(err, results){
+          console.table(results);
+          console.log("Deparments added!\n");
+          if (err) throw err;
+          firstPrompt();
+        })
       })
     })
+    
   };
 
+  function updateEmployee(){
+    console.log("Updating Employee");
+    connection.query(`SELECT * FROM employee, roles`, (err, results) => {
+      if (err) throw err;
+
+      inquirer.prompt([
+        {
+        type: 'list',
+        name: 'employee',
+        message: 'Which employee role do you want to update?',
+        choices: () => {
+          let array = [];
+          for (let i = 0; i< results.length; i++){
+            array.push(results[i].last_name);
+          }
+          let employeeArray = [... new Set(array)];
+          return employeeArray;
+        }
+      },
+      {
+        type: 'list',
+        name: 'roles',
+        message: 'What is their new role?',
+        choices: () => {
+          let array = [];
+          for (let i = 0; i < results.length; i++){
+            array.push(results[i].title);
+          }
+          let newArray = [...new Set(array)];
+          return newArray;
+        }
+      }
+    ]). then((answers) =>{
+      for (let i =0; i< results.length; i++){
+        if(results[i].last_name === answers.employee) {
+          var names = results[i];
+        }
+      }
+      for (var i = 0; i < results.length; i++) {
+        if (results[i].title === answers.role) {
+            var roles = results[i];
+        }
+    }
+
+    connection.query(`UPDATE employee SET ? WHERE ?`, [{role_id: roles}, {last_name: names}], (err, results) => {
+        if (err) throw err;
+        console.log(`Updated ${answers.employee} role to the database.`)
+        employee_tracker();
+    });
+    })
+    })
+  }
 
 
   app.listen(PORT, () => {
