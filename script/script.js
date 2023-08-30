@@ -211,7 +211,7 @@ function firstPrompt(){
     connection.query(`UPDATE employee SET ? WHERE ?`, [{role_id: roles}, {last_name: names}], (err, results) => {
         if (err) throw err;
         console.log(`Updated ${answers.employee} role to the database.`)
-        employee_tracker();
+        firstPrompt();
     });
     })
     })
